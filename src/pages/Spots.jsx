@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import spotsData from '../data/spots.json'
 import { useAdmin } from '../lib/admin.js'
 
-const STORAGE_KEY = 'shanghai-spots-custom-v1'
+const STORAGE_KEY = 'osaka-spots-custom-v1'
 
 function mapsUrl(query) {
   return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(query)

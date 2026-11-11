@@ -2,23 +2,13 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import packingList from '../data/packingList.json'
 
-const STORAGE_KEY = 'shanghai-packing-checked-v2'
+const STORAGE_KEY = 'osaka-packing-checked-v2'
 // 格式：{ 人名: { 'g0-c0-i0': true } }，每人的勾選各自獨立、互不影響
 const DEFAULT_PERSON = '我'
 
 function loadAll() {
   try {
-    const raw = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}
-    // 相容舊版單人格式 packing-checked
-    if (Object.keys(raw).length === 0) {
-      try {
-        const legacy = JSON.parse(localStorage.getItem('shanghai-packing-checked')) || {}
-        if (Object.keys(legacy).length > 0) return { [DEFAULT_PERSON]: legacy }
-      } catch {
-        /* ignore */
-      }
-    }
-    return raw
+    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}
   } catch {
     return {}
   }

@@ -1,22 +1,26 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAdmin } from '../lib/admin.js'
+import seedExpenses from '../data/expenses.json'
 
-const STORAGE_KEY = 'shanghai-expenses-v1'
+const STORAGE_KEY = 'osaka-expenses-v1'
 
 const CATEGORIES = ['餐飲', '交通', '住宿', '門票', '購物', '其他']
-const CURRENCIES = ['CNY', 'TWD']
+const CURRENCIES = ['JPY', 'TWD']
 
 function loadExpenses() {
   try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY))
+    if (saved && saved.length > 0) return saved
   } catch {
-    return []
+    // fall through to seed
   }
+  // 第一次開啟：先帶入已付的機票費用，之後的修改存在這支手機上
+  return seedExpenses.expenses || []
 }
 
 function todayStr() {
-  return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Shanghai' }).format(new Date())
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Tokyo' }).format(new Date())
 }
 
 const EXPORT_HEADER = ['日期', '分類', '項目', '金額', '幣別', '備註']
@@ -88,7 +92,7 @@ export default function Expenses() {
     category: '餐飲',
     item: '',
     amount: '',
-    currency: 'CNY',
+    currency: 'JPY',
     note: '',
   })
 
@@ -97,7 +101,7 @@ export default function Expenses() {
   }, [expenses])
 
   const totals = useMemo(() => {
-    const t = { CNY: 0, TWD: 0 }
+    const t = { JPY: 0, TWD: 0 }
     expenses.forEach((e) => {
       t[e.currency] = (t[e.currency] || 0) + Number(e.amount || 0)
     })
@@ -123,7 +127,7 @@ export default function Expenses() {
       category: '餐飲',
       item: '',
       amount: '',
-      currency: 'CNY',
+      currency: 'JPY',
       note: '',
     })
     setEditingId(null)

@@ -1,6 +1,6 @@
 // Local overrides for day schedules, stored on-device (no GitHub sync).
 // Keyed by day id: { [dayId]: [scheduleItem, ...] }
-const KEY = 'shanghai-itinerary-overrides-v1'
+const KEY = 'osaka-itinerary-overrides-v1'
 
 export function loadOverrides() {
   try {

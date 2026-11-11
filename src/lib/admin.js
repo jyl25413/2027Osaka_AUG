@@ -4,8 +4,8 @@ import { useEffect, useState } from 'react'
 // - 預設為旅伴檢視模式，編輯按鈕隱藏
 // - 管理員用密碼解鎖（session 有效，關分頁即失效）
 // - 密碼雜湊存 localStorage（僅防君子不防小人；真正的跨裝置同步待 Cloudflare 後端）
-const PW_KEY = 'shanghai-admin-pw'
-const SESSION_KEY = 'shanghai-admin'
+const PW_KEY = 'osaka-admin-pw'
+const SESSION_KEY = 'osaka-admin'
 
 function hash(s) {
   let h = 5381
