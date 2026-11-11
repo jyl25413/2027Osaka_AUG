@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  background-color: #1b1b1d;
+  color: #f0f0f0;
+  font-family: "Microsoft JhengHei", "PingFang TC", "Noto Sans TC", "Microsoft YaHei", ui-sans-serif, system-ui, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
