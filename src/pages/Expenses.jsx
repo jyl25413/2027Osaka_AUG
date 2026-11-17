@@ -1,7 +1,15 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAdmin } from '../lib/admin.js'
 import seedExpenses from '../data/expenses.json'
+import {
+  fetchCloudExpenses,
+  getSyncUrl,
+  isSyncConfigured,
+  mergeExpenses,
+  pushCloudExpenses,
+  saveSyncUrl,
+} from '../lib/expenseSync.js'
 
 const STORAGE_KEY = 'osaka-expenses-v1'
 
@@ -21,6 +29,15 @@ function loadExpenses() {
 
 function todayStr() {
   return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Tokyo' }).format(new Date())
+}
+
+function timeStr(d) {
+  return new Intl.DateTimeFormat('zh-TW', {
+    timeZone: 'Asia/Taipei',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).format(d)
 }
 
 const EXPORT_HEADER = ['日期', '分類', '項目', '金額', '幣別', '備註']
@@ -96,9 +113,114 @@ export default function Expenses() {
     note: '',
   })
 
+  // ---- 雲端同步狀態 ----
+  const [syncStatus, setSyncStatus] = useState(isSyncConfigured() ? 'idle' : 'unconfigured')
+  const [lastSyncAt, setLastSyncAt] = useState(null)
+  const [syncError, setSyncError] = useState('')
+  const [syncUrlInput, setSyncUrlInput] = useState(getSyncUrl())
+  const [showSyncSettings, setShowSyncSettings] = useState(false)
+  const [urlSaved, setUrlSaved] = useState(false)
+  const skipPushRef = useRef(false)
+  const isFirstRender = useRef(true)
+
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(expenses))
   }, [expenses])
+
+  // 每當花費變動，自動推到雲端（已設定才推；剛從雲端拉回的那次跳過）
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+      return
+    }
+    if (skipPushRef.current) {
+      skipPushRef.current = false
+      return
+    }
+    if (!isSyncConfigured()) return
+    let cancelled = false
+    setSyncStatus('syncing')
+    setSyncError('')
+    pushCloudExpenses(expenses)
+      .then(() => {
+        if (cancelled) return
+        setSyncStatus('ok')
+        setLastSyncAt(new Date())
+      })
+      .catch((err) => {
+        if (cancelled) return
+        setSyncStatus('error')
+        setSyncError(err.message || '同步失敗')
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [expenses])
+
+  // 初次載入：本機沒有資料且雲端已設定，自動從雲端拉回
+  useEffect(() => {
+    if (!isSyncConfigured()) return
+    if (loadExpenses().length === 0) {
+      pullFromCloud()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  async function pullFromCloud() {
+    if (!isSyncConfigured()) return
+    setSyncStatus('syncing')
+    setSyncError('')
+    try {
+      const cloud = await fetchCloudExpenses()
+      skipPushRef.current = true
+      setExpenses(cloud)
+      setSyncStatus('ok')
+      setLastSyncAt(new Date())
+    } catch (err) {
+      setSyncStatus('error')
+      setSyncError(err.message || '同步失敗')
+    }
+  }
+
+  function handlePullClick() {
+    if (expenses.length > 0) {
+      if (!window.confirm('這會用雲端的資料覆蓋手機上的記錄，確定要從雲端同步嗎？')) return
+    }
+    pullFromCloud()
+  }
+
+  async function handleSaveSyncUrl() {
+    const url = syncUrlInput.trim()
+    if (!url) return
+    saveSyncUrl(url)
+    setUrlSaved(true)
+    setTimeout(() => setUrlSaved(false), 2000)
+    setShowSyncSettings(false)
+    setSyncStatus('syncing')
+    setSyncError('')
+    try {
+      const cloud = await fetchCloudExpenses()
+      if (cloud.length === 0 && expenses.length > 0) {
+        // 雲端是空的，把本機推上去
+        await pushCloudExpenses(expenses)
+      } else if (expenses.length === 0 && cloud.length > 0) {
+        // 本機是空的，從雲端拉下來
+        skipPushRef.current = true
+        setExpenses(cloud)
+      } else if (cloud.length > 0 && expenses.length > 0) {
+        // 兩邊都有，用 ID 合併（雲端優先），再推回雲端
+        const merged = mergeExpenses(expenses, cloud)
+        skipPushRef.current = true
+        setExpenses(merged)
+        await pushCloudExpenses(merged)
+      }
+      setSyncStatus('ok')
+      setLastSyncAt(new Date())
+    } catch (err) {
+      setSyncStatus('error')
+      setSyncError(err.message || '同步失敗')
+    }
+  }
 
   const totals = useMemo(() => {
     const t = { JPY: 0, TWD: 0 }
@@ -204,6 +326,17 @@ export default function Expenses() {
     URL.revokeObjectURL(url)
   }
 
+  const syncLabel =
+    syncStatus === 'syncing'
+      ? '☁️ 同步中…'
+      : syncStatus === 'ok'
+        ? `☁️ 已同步${lastSyncAt ? ` ${timeStr(lastSyncAt)}` : ''}`
+        : syncStatus === 'error'
+          ? `☁️ 同步失敗（資料只存手機）${syncError ? `：${syncError}` : ''}`
+          : syncStatus === 'idle'
+            ? '☁️ 雲端同步已設定'
+            : '☁️ 尚未設定雲端同步'
+
   return (
     <div className="mx-auto min-h-screen max-w-md px-5 pb-12">
       <header className="pt-6">
@@ -224,6 +357,50 @@ export default function Expenses() {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* 雲端同步狀態 */}
+      <div className="mt-3 rounded-xl border border-paper-border bg-paper-card px-4 py-3">
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-xs font-bold">{syncLabel}</span>
+          {isSyncConfigured() && (
+            <button
+              onClick={handlePullClick}
+              className="shrink-0 rounded-lg border border-paper-border bg-paper px-2.5 py-1.5 text-xs font-bold text-ink active:bg-paper-card"
+            >
+              從雲端同步
+            </button>
+          )}
+        </div>
+        {admin && (
+          <button
+            onClick={() => setShowSyncSettings((v) => !v)}
+            className="mt-2 text-xs font-bold text-seal active:text-seal-dark"
+          >
+            {showSyncSettings ? '收起設定' : '雲端同步設定'}
+          </button>
+        )}
+        {admin && showSyncSettings && (
+          <div className="mt-2">
+            <label className={labelCls}>Google Apps Script 網址（/exec 結尾）</label>
+            <input
+              className={inputCls}
+              value={syncUrlInput}
+              onChange={(e) => setSyncUrlInput(e.target.value)}
+              placeholder="https://script.google.com/macros/s/…/exec"
+              inputMode="url"
+            />
+            <button
+              onClick={handleSaveSyncUrl}
+              className="mt-2 w-full rounded-lg bg-seal py-2 text-xs font-bold text-ink active:bg-seal-dark"
+            >
+              {urlSaved ? '已儲存 ✓' : '儲存並同步'}
+            </button>
+            <p className="mt-1.5 text-[11px] leading-relaxed text-ink-muted">
+              部署方式：打開「2027 大阪行 - 花費」試算表 → 擴充功能 → Apps Script → 貼上同步程式 → 部署為網頁應用程式 → 執行身分「我」、存取權「所有人」→ 複製網址貼到這裡。
+            </p>
+          </div>
+        )}
       </div>
 
       {admin && (
@@ -363,7 +540,7 @@ export default function Expenses() {
         ))}
       </main>
 
-      <p className="mt-8 text-center text-xs text-ink-muted">記錄存在這支手機上，不會上傳</p>
+      <p className="mt-8 text-center text-xs text-ink-muted">記錄存在這支手機上，設定雲端同步後會同時寫進 Google 試算表</p>
     </div>
   )
 }
