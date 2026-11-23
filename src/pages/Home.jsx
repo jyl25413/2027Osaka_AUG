@@ -73,7 +73,7 @@ export default function Home() {
         <div className="border-2 border-ink p-1.5">
           <div className="border border-ink/30 px-6 py-10 text-center">
             <p className="text-xs font-bold tracking-[0.6em] text-seal">旅行手冊</p>
-            <p className="mt-1 text-[10px] tracking-[0.3em] text-ink-muted">
+            <p className="mt-1 text-[15px] tracking-[0.3em] text-ink-muted">
               TRAVEL HANDBOOK
             </p>
             <h1 className="mt-5 text-3xl font-bold leading-snug">{trip.title}</h1>
@@ -95,7 +95,7 @@ export default function Home() {
       <main className="px-6">
         <div className="mb-3 flex items-baseline justify-between">
           <h2 className="text-lg font-bold">每日行程</h2>
-          <span className="text-[10px] tracking-[0.3em] text-ink-muted">ITINERARY</span>
+          <span className="text-[15px] tracking-[0.3em] text-ink-muted">ITINERARY</span>
         </div>
 
         <nav>
@@ -116,7 +116,7 @@ export default function Home() {
 
         <div className="mb-3 mt-8 flex items-baseline justify-between">
           <h2 className="text-lg font-bold">附錄</h2>
-          <span className="text-[10px] tracking-[0.3em] text-ink-muted">APPENDIX</span>
+          <span className="text-[15px] tracking-[0.3em] text-ink-muted">APPENDIX</span>
         </div>
 
         <nav className="grid grid-cols-2 gap-3">
@@ -185,7 +185,7 @@ export default function Home() {
               >
                 {needSetPw ? '設定並登入' : '登入'}
               </button>
-              <p className="mt-2 text-[10px] leading-relaxed text-ink-muted">
+              <p className="mt-2 text-[15px] leading-relaxed text-ink-muted">
                 管理員可編輯行程、新增花費與景點、上傳路線圖；旅伴為檢視模式，只能看行程與勾選自己的打包清單。
               </p>
             </div>

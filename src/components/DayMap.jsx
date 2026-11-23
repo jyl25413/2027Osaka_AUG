@@ -5,7 +5,7 @@ import { geocode } from '../lib/geocode.js'
 
 function numberedIcon(label, color) {
   return L.divIcon({
-    html: `<div style="background:${color};color:#fff;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,0.4)">${label}</div>`,
+    html: `<div style="background:${color};color:#fff;width:39px;height:39px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:600;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,0.4)">${label}</div>`,
     className: '',
     iconSize: [26, 26],
     iconAnchor: [13, 13],

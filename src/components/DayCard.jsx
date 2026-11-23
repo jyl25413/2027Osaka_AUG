@@ -26,15 +26,15 @@ export default function DayCard({ day, index, isToday = false, isPast = false })
           {dayNum}
         </span>
         <div className="relative min-w-0 flex-1 text-white">
-          <div className="flex items-center gap-2 text-[11px] font-medium tracking-wide text-white/80">
+          <div className="flex items-center gap-2 text-[17px] font-medium tracking-wide text-white/80">
             {day.date}（{day.weekday}）
             {isToday && (
-              <span className="rounded-full bg-paper-card px-2 py-0.5 text-[10px] font-bold text-brand-600">
+              <span className="rounded-full bg-paper-card px-2 py-0.5 text-[15px] font-bold text-brand-600">
                 今天
               </span>
             )}
             {isPast && (
-              <span className="rounded-full bg-black/30 px-2 py-0.5 text-[10px] font-bold text-white">
+              <span className="rounded-full bg-black/30 px-2 py-0.5 text-[15px] font-bold text-white">
                 已結束
               </span>
             )}

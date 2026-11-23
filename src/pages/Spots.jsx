@@ -163,10 +163,10 @@ export default function Spots() {
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
                   <h3 className="text-base font-bold text-ink">{s.name}</h3>
-                  <span className="rounded-full bg-paper px-2 py-0.5 text-[10px] font-bold text-ink-muted">
+                  <span className="rounded-full bg-paper px-2 py-0.5 text-[15px] font-bold text-ink-muted">
                     {s.category}
                   </span>
-                  <span className="rounded-full bg-paper px-2 py-0.5 text-[10px] font-bold text-ink-muted">
+                  <span className="rounded-full bg-paper px-2 py-0.5 text-[15px] font-bold text-ink-muted">
                     {s.area}
                   </span>
                 </div>

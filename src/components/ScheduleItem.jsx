@@ -28,7 +28,7 @@ export default function ScheduleItem({ item, isLast = false, mapNumber }) {
             {icon}
           </div>
           {mapNumber != null && (
-            <div className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full border border-white bg-seal text-[10px] font-bold text-ink">
+            <div className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full border border-white bg-seal text-[15px] font-bold text-ink">
               {mapNumber}
             </div>
           )}

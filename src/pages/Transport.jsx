@@ -187,11 +187,11 @@ export default function Transport() {
               <img src={img.dataUrl} alt={img.name} className="aspect-square w-full object-cover" />
             </button>
             <div className="flex items-center justify-between px-2 py-1.5">
-              <span className="truncate text-[11px] text-ink-muted">{img.name}</span>
+              <span className="truncate text-[17px] text-ink-muted">{img.name}</span>
               {admin && (
               <button
                 onClick={() => handleDelete(img.id)}
-                className="shrink-0 px-1 text-[11px] font-bold text-red-500"
+                className="shrink-0 px-1 text-[17px] font-bold text-red-500"
               >
                 刪除
               </button>

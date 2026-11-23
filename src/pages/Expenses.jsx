@@ -396,7 +396,7 @@ export default function Expenses() {
             >
               {urlSaved ? '已儲存 ✓' : '儲存並同步'}
             </button>
-            <p className="mt-1.5 text-[11px] leading-relaxed text-ink-muted">
+            <p className="mt-1.5 text-[17px] leading-relaxed text-ink-muted">
               部署方式：打開「2027 大阪行 - 花費」試算表 → 擴充功能 → Apps Script → 貼上同步程式 → 部署為網頁應用程式 → 執行身分「我」、存取權「所有人」→ 複製網址貼到這裡。
             </p>
           </div>
@@ -505,7 +505,7 @@ export default function Expenses() {
                     e.id === editingId ? 'bg-paper' : ''
                   }`}
                 >
-                  <span className="shrink-0 rounded-full bg-paper px-2 py-0.5 text-[11px] font-bold text-ink-muted">
+                  <span className="shrink-0 rounded-full bg-paper px-2 py-0.5 text-[17px] font-bold text-ink-muted">
                     {e.category}
                   </span>
                   <span className="min-w-0 flex-1">
